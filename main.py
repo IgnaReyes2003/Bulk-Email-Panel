@@ -1,10 +1,58 @@
 from tkinter import*
+from PIL import ImageTk #pip install pillow
 
 class bulk_email:
     def __init__(self,root):
         self.root=root
-        self.root.title("Bulk Email")
-        self.root.geometry("1000x450+165+100")
+        self.root.title("Bulk Email Application")
+        self.root.geometry("1000x550+165+100")
+        self.root.resizable(False,False)
+        self.root.config(bg="white")
+
+        #=========== Icons / Iconos ========================
+
+        self.email_icon=ImageTk.PhotoImage(file="images/email.png")
+        self.setting_icon=ImageTk.PhotoImage(file="images/setting.png")
+
+        #=========== Title / Título ========================
+        title=Label(self.root,text="Bulk Email Send Pannel",image=self.email_icon,padx=10,compound=LEFT,font=("Tahoma",40,"bold"),bg="#1289A7",fg="white",anchor="w").place(x=0,y=0,relwidth=1)
+        desc=Label(self.root,text="Use Excel File to Send the Bulk Email at once, with just click. Ensure the Email Column Name must be Email",font=("calibri (body)",14),bg="#f6e58d",fg="black").place(x=0,y=78,relwidth=1)
+
+        btn_setting=Button(self.root,image=self.setting_icon,bd=0,activebackground="#1289A7",bg="#1289A7",cursor="hand2",command=self.setting_win).place(x=900,y=5)
+
+        #===================================================
+        self.var_choice=StringVar()
+        single=Radiobutton(self.root,text="Single",value="single",variable=self.var_choice,activebackground="white",font=("times new roman",30,"bold"),bg="white",fg="#262626").place(x=50,y=150)
+        bulk=Radiobutton(self.root,text="Bulk",value="bulk",variable=self.var_choice,activebackground="white",font=("times new roman",30,"bold"),bg="white",fg="#262626").place(x=200,y=150)
+        self.var_choice.set("single")
+
+        #===================================================
+
+        to=Label(self.root,text="To (Email Adress)",font=("times new roman",18),bg="white").place(x=50,y=250)
+        subj=Label(self.root,text="SUBJECT",font=("times new roman",18),bg="white").place(x=50,y=300)
+        msg=Label(self.root,text="MESSAGE",font=("times new roman",18),bg="white").place(x=50,y=350)
+
+        self.txt_to=Entry(self.root,font=("times new roman",14),bg="#c8d6e5")
+        self.txt_to.place(x=300,y=250,width=350,height=30)
+
+        btn_browse=Button(self.root,text="BROWSE",font=("times new roman",13,"bold"),bg="#12CBC4",fg="black",activebackground="#12CBC4",activeforeground="black",cursor="hand2").place(x=670,y=250,width=120,height=30)
+
+        self.txt_subj=Entry(self.root,font=("times new roman",14),bg="#c8d6e5")
+        self.txt_subj.place(x=300,y=300,width=450,height=30)
+
+        self.txt_msg=Text(self.root,font=("times new roman",12),bg="#c8d6e5")
+        self.txt_msg.place(x=300,y=350,width=650,height=100)
+
+        btn_clear=Button(self.root,text="CLEAR",font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=690,y=480,width=120,height=35)
+        btn_send=Button(self.root,text="SEND",font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=830,y=480,width=120,height=35)
+
+    def setting_win(self):
+        self.root2=Toplevel()
+        self.root2.title("Settings")
+        self.root2.geometry("700x450+330+140")
+        self.root2.focus_force()
+        self.root2.grab_set()
+        title2=Label(self.root2,text="Credentials Setting",image=self.setting_icon,padx=10,compound=LEFT,font=("Tahoma",40,"bold"),bg="#1289A7",fg="white",anchor="w").place(x=0,y=0,relwidth=1)
 
 root=Tk()
 obj=bulk_email(root)
