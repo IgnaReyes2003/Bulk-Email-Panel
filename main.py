@@ -1,5 +1,6 @@
 from tkinter import*
 from PIL import ImageTk #pip install pillow
+from tkinter import messagebox
 
 class bulk_email:
     def __init__(self,root):
@@ -22,8 +23,8 @@ class bulk_email:
 
         #===================================================
         self.var_choice=StringVar()
-        single=Radiobutton(self.root,text="Single",value="single",variable=self.var_choice,activebackground="white",font=("times new roman",30,"bold"),bg="white",fg="#262626").place(x=50,y=150)
-        bulk=Radiobutton(self.root,text="Bulk",value="bulk",variable=self.var_choice,activebackground="white",font=("times new roman",30,"bold"),bg="white",fg="#262626").place(x=200,y=150)
+        single=Radiobutton(self.root,text="Single",value="single",variable=self.var_choice,activebackground="white",font=("times new roman",30,"bold"),bg="white",fg="#262626",command=self.check_single_or_bulk).place(x=50,y=150)
+        bulk=Radiobutton(self.root,text="Bulk",value="bulk",variable=self.var_choice,activebackground="white",font=("times new roman",30,"bold"),bg="white",fg="#262626",command=self.check_single_or_bulk).place(x=200,y=150)
         self.var_choice.set("single")
 
         #===================================================
@@ -35,7 +36,8 @@ class bulk_email:
         self.txt_to=Entry(self.root,font=("times new roman",14),bg="#c8d6e5")
         self.txt_to.place(x=300,y=250,width=350,height=30)
 
-        btn_browse=Button(self.root,text="BROWSE",font=("times new roman",13,"bold"),bg="#12CBC4",fg="black",activebackground="#12CBC4",activeforeground="black",cursor="hand2").place(x=670,y=250,width=120,height=30)
+        self.btn_browse=Button(self.root,text="BROWSE",font=("times new roman",13,"bold"),bg="#12CBC4",fg="black",activebackground="#12CBC4",activeforeground="black",cursor="hand2",state=DISABLED)
+        self.btn_browse.place(x=670,y=250,width=120,height=30)
 
         self.txt_subj=Entry(self.root,font=("times new roman",14),bg="#c8d6e5")
         self.txt_subj.place(x=300,y=300,width=450,height=30)
@@ -43,16 +45,61 @@ class bulk_email:
         self.txt_msg=Text(self.root,font=("times new roman",12),bg="#c8d6e5")
         self.txt_msg.place(x=300,y=350,width=650,height=100)
 
-        btn_clear=Button(self.root,text="CLEAR",font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=690,y=480,width=120,height=35)
-        btn_send=Button(self.root,text="SEND",font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=830,y=480,width=120,height=35)
+        btn_clear=Button(self.root,text="CLEAR",command=self.clear1,font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=690,y=480,width=120,height=35)
+        btn_send=Button(self.root,text="SEND",command=self.send_email,font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=830,y=480,width=120,height=35)
+
+    def send_email(self):
+        x= len(self.txt_msg.get("1.0",END))
+        if self.txt_to.get() == "" or self.txt_subj.get() == "" or x == 1:
+            messagebox.showerror("Error","All fields are required",parent=self.root)
+        else:
+            messagebox.showinfo("Success","Email has been sent!!!",parent=self.root)
+
+    def check_single_or_bulk(self):
+        if self.var_choice.get() == "single":
+            self.btn_browse.config(state=DISABLED)
+        if self.var_choice.get() == "bulk":
+            self.btn_browse.config(state=NORMAL)
+
+    def clear1(self):
+        self.txt_to.delete(0,END)
+        self.txt_subj.delete(0,END)
+        self.txt_msg.delete("1.0",END)
+        self.var_choice.set("single")
+        self.btn_browse.config(state=DISABLED)
 
     def setting_win(self):
         self.root2=Toplevel()
         self.root2.title("Settings")
-        self.root2.geometry("700x450+330+140")
+        self.root2.geometry("700x350+330+140")
+        self.root2.resizable(False,False)
         self.root2.focus_force()
         self.root2.grab_set()
-        title2=Label(self.root2,text="Credentials Setting",image=self.setting_icon,padx=10,compound=LEFT,font=("Tahoma",40,"bold"),bg="#1289A7",fg="white",anchor="w").place(x=0,y=0,relwidth=1)
+        self.root2.config(bg="white")
+
+        title2=Label(self.root2,text="Credentials Setting",image=self.setting_icon,padx=10,compound=LEFT,font=("Tahoma",38,"bold"),bg="#1289A7",fg="white",anchor="w").place(x=0,y=0,relwidth=1)
+        desc2=Label(self.root2,text="Enter the Email address and password from which to send all emails.",font=("calibri (body)",14),bg="#f6e58d",fg="black").place(x=0,y=70,relwidth=1)
+
+        from_=Label(self.root2,text="Email Address",font=("times new roman",18),bg="white").place(x=50,y=150)
+        pass_=Label(self.root2,text="PASSWORD",font=("times new roman",18),bg="white").place(x=50,y=200)
+
+        self.txt_from=Entry(self.root2,font=("times new roman",14),bg="#c8d6e5")
+        self.txt_from.place(x=250,y=150,width=330,height=30)
+
+        self.txt_pass=Entry(self.root2,font=("times new roman",14),bg="#c8d6e5")
+        self.txt_pass.place(x=250,y=200,width=330,height=30)
+
+        btn_clear=Button(self.root2,text="CLEAR",font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=285,y=260,width=120,height=35)
+        btn_save=Button(self.root2,text="SAVE",command=self.save_setting,font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=425,y=260,width=120,height=35)
+
+    def save_setting(self):
+        if self.txt_from.get() == "" or self.txt_pass.get() == "":
+            messagebox.showerror("Error","All fields are required",parent=self.root2)
+        else:
+            f=open("important.txt","w")
+            f.write(self.txt_from.get()+","+self.txt_pass.get())
+            f.close()
+            messagebox.showinfo("Success","The e-mail address and password have been saved!")
 
 root=Tk()
 obj=bulk_email(root)
