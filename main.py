@@ -1,6 +1,7 @@
 from tkinter import*
 from PIL import ImageTk #pip install pillow
 from tkinter import messagebox
+import os
 
 class bulk_email:
     def __init__(self,root):
@@ -12,6 +13,8 @@ class bulk_email:
 
         #=========== Icons / Iconos ========================
 
+        self.pass_icon=ImageTk.PhotoImage(file="images/pass_block.png")
+        self.pass2_icon=ImageTk.PhotoImage(file="images/pass_normal.png")
         self.email_icon=ImageTk.PhotoImage(file="images/email.png")
         self.setting_icon=ImageTk.PhotoImage(file="images/setting.png")
 
@@ -69,6 +72,7 @@ class bulk_email:
         self.btn_browse.config(state=DISABLED)
 
     def setting_win(self):
+        self.check_file_exist()
         self.root2=Toplevel()
         self.root2.title("Settings")
         self.root2.geometry("700x350+330+140")
@@ -86,11 +90,36 @@ class bulk_email:
         self.txt_from=Entry(self.root2,font=("times new roman",14),bg="#c8d6e5")
         self.txt_from.place(x=250,y=150,width=330,height=30)
 
-        self.txt_pass=Entry(self.root2,font=("times new roman",14),bg="#c8d6e5")
+        self.txt_pass=Entry(self.root2,font=("times new roman",14),bg="#c8d6e5",show="*")
         self.txt_pass.place(x=250,y=200,width=330,height=30)
+
+        self.btn_visibility=Button(self.root2,image=self.pass_icon,command=self.pass_visibility,bd=0,bg="white",fg="white",activebackground="white",activeforeground="white",cursor="hand2")
+        self.btn_visibility.place(x=585,y=190,width=50,height=45)
 
         btn_clear=Button(self.root2,text="CLEAR",font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=285,y=260,width=120,height=35)
         btn_save=Button(self.root2,text="SAVE",command=self.save_setting,font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=425,y=260,width=120,height=35)
+        self.txt_from.insert(0,self.from_)
+        self.txt_pass.insert(0,self.pass_)
+
+    def pass_visibility(self):
+        if self.txt_pass["show"] == "*":
+            self.txt_pass["show"] = ""
+            self.btn_visibility.config(image=self.pass2_icon)
+        else:
+            self.txt_pass["show"] = "*"
+            self.btn_visibility.config(image=self.pass_icon)
+
+    def check_file_exist(self):
+        if os.path.exists("important.txt") == False:
+            f=open("important.txt","w")
+            f.write(",")
+            f.close()
+        f2=open("important.txt","r")
+        self.credentials=[]
+        for i in f2:
+            self.credentials.append([i.split(",")[0],i.split(",")[1]])
+        self.from_=self.credentials[0][0]
+        self.pass_=self.credentials[0][1]
 
     def save_setting(self):
         if self.txt_from.get() == "" or self.txt_pass.get() == "":
