@@ -1,7 +1,8 @@
 from tkinter import*
 from PIL import ImageTk #pip install pillow
-from tkinter import messagebox
+from tkinter import messagebox,filedialog
 import os
+import pandas as pd #pip install pandas
 
 class bulk_email:
     def __init__(self,root):
@@ -13,6 +14,7 @@ class bulk_email:
 
         #=========== Icons / Iconos ========================
 
+        root.iconbitmap("images/icon.ico")
         self.pass_icon=ImageTk.PhotoImage(file="images/pass_block.png")
         self.pass2_icon=ImageTk.PhotoImage(file="images/pass_normal.png")
         self.email_icon=ImageTk.PhotoImage(file="images/email.png")
@@ -39,7 +41,7 @@ class bulk_email:
         self.txt_to=Entry(self.root,font=("times new roman",14),bg="#c8d6e5")
         self.txt_to.place(x=300,y=250,width=350,height=30)
 
-        self.btn_browse=Button(self.root,text="BROWSE",font=("times new roman",13,"bold"),bg="#12CBC4",fg="black",activebackground="#12CBC4",activeforeground="black",cursor="hand2",state=DISABLED)
+        self.btn_browse=Button(self.root,command=self.browse_file,text="BROWSE",font=("times new roman",13,"bold"),bg="#12CBC4",fg="black",activebackground="#12CBC4",activeforeground="black",cursor="hand2",state=DISABLED)
         self.btn_browse.place(x=670,y=250,width=120,height=30)
 
         self.txt_subj=Entry(self.root,font=("times new roman",14),bg="#c8d6e5")
@@ -48,8 +50,50 @@ class bulk_email:
         self.txt_msg=Text(self.root,font=("times new roman",12),bg="#c8d6e5")
         self.txt_msg.place(x=300,y=350,width=650,height=100)
 
+        #================= Status  =========================
+        self.lbl_total=Label(self.root,font=("times new roman",18),bg="white")
+        self.lbl_total.place(x=50,y=485)
+
+        self.lbl_sent=Label(self.root,font=("times new roman",18),bg="white",fg="green")
+        self.lbl_sent.place(x=296,y=485)
+
+        self.lbl_left=Label(self.root,font=("times new roman",18),bg="white",fg="orange")
+        self.lbl_left.place(x=412,y=485)
+
+        self.lbl_failed=Label(self.root,font=("times new roman",18),bg="white",fg="red")
+        self.lbl_failed.place(x=542,y=485)
+
+        #===================================================
+
         btn_clear=Button(self.root,text="CLEAR",command=self.clear1,font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=690,y=480,width=120,height=35)
         btn_send=Button(self.root,text="SEND",command=self.send_email,font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=830,y=480,width=120,height=35)
+
+    def browse_file(self):
+        op=filedialog.askopenfile(initialdir="/",title="Select Excel File for Emails",filetypes=(("All Files","*.*"),("Excel Files",".xlsx")))
+        if op != None:
+            data = pd.read_excel(op.name)
+            if "Email" in data.columns:
+                self.emails=list(data["Email"])
+                c=[]
+                for i in self.emails:
+                    if pd.isnull(i) == False:
+                        c.append(i)
+                self.emails=c
+                if len(self.emails)>0:
+                    self.txt_to.config(state=NORMAL)
+                    self.txt_to.delete(0,END)
+                    self.txt_to.insert(0,str(op.name.split("/")[-1]))
+                    self.txt_to.config(state="readonly")
+                    self.lbl_total.config(text="Total: "+str(len(self.emails)))
+                    self.lbl_sent.config(text="SENT: ")
+                    self.lbl_left.config(text="LEFT: ")
+                    self.lbl_failed.config(text="FAILED: ")
+                else:
+                    messagebox.showerror("Error","This file has no email address",parent=self.root)
+
+            else:
+                messagebox.showerror("Error","Please select file which have Email Columns",parent=self.root)
+
 
     def send_email(self):
         x= len(self.txt_msg.get("1.0",END))
@@ -61,15 +105,24 @@ class bulk_email:
     def check_single_or_bulk(self):
         if self.var_choice.get() == "single":
             self.btn_browse.config(state=DISABLED)
+            self.txt_to.config(state=NORMAL)
+            self.txt_to.delete(0,END)
         if self.var_choice.get() == "bulk":
             self.btn_browse.config(state=NORMAL)
+            self.txt_to.delete(0,END)
+            self.txt_to.config(state="readonly")
 
     def clear1(self):
+        self.txt_to.config(state=NORMAL)
         self.txt_to.delete(0,END)
         self.txt_subj.delete(0,END)
         self.txt_msg.delete("1.0",END)
         self.var_choice.set("single")
         self.btn_browse.config(state=DISABLED)
+        self.lbl_total.config(text="")
+        self.lbl_sent.config(text="")
+        self.lbl_left.config(text="")
+        self.lbl_failed.config(text="")
 
     def setting_win(self):
         self.check_file_exist()
@@ -80,6 +133,7 @@ class bulk_email:
         self.root2.focus_force()
         self.root2.grab_set()
         self.root2.config(bg="white")
+        self.root2.iconbitmap("images/config.ico")
 
         title2=Label(self.root2,text="Credentials Setting",image=self.setting_icon,padx=10,compound=LEFT,font=("Tahoma",38,"bold"),bg="#1289A7",fg="white",anchor="w").place(x=0,y=0,relwidth=1)
         desc2=Label(self.root2,text="Enter the Email address and password from which to send all emails.",font=("calibri (body)",14),bg="#f6e58d",fg="black").place(x=0,y=70,relwidth=1)
@@ -96,10 +150,14 @@ class bulk_email:
         self.btn_visibility=Button(self.root2,image=self.pass_icon,command=self.pass_visibility,bd=0,bg="white",fg="white",activebackground="white",activeforeground="white",cursor="hand2")
         self.btn_visibility.place(x=585,y=190,width=50,height=45)
 
-        btn_clear=Button(self.root2,text="CLEAR",font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=285,y=260,width=120,height=35)
+        btn_clear=Button(self.root2,command=self.clear2,text="CLEAR",font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=285,y=260,width=120,height=35)
         btn_save=Button(self.root2,text="SAVE",command=self.save_setting,font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=425,y=260,width=120,height=35)
         self.txt_from.insert(0,self.from_)
         self.txt_pass.insert(0,self.pass_)
+
+    def clear2(self):
+        self.txt_from.delete(0,END)
+        self.txt_pass.delete(0,END)
 
     def pass_visibility(self):
         if self.txt_pass["show"] == "*":
