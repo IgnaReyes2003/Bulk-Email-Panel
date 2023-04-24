@@ -3,6 +3,7 @@ from PIL import ImageTk #pip install pillow
 from tkinter import messagebox,filedialog
 import os
 import pandas as pd #pip install pandas
+import email_function
 
 class bulk_email:
     def __init__(self,root):
@@ -67,6 +68,7 @@ class bulk_email:
 
         btn_clear=Button(self.root,text="CLEAR",command=self.clear1,font=("Tahoma",18,"bold"),bg="#30336b",fg="white",activebackground="#30336b",activeforeground="white",cursor="hand2").place(x=690,y=480,width=120,height=35)
         btn_send=Button(self.root,text="SEND",command=self.send_email,font=("Tahoma",18,"bold"),bg="#32ff7e",fg="white",activebackground="#32ff7e",activeforeground="white",cursor="hand2").place(x=830,y=480,width=120,height=35)
+        self.check_file_exist()
 
     def browse_file(self):
         op=filedialog.askopenfile(initialdir="/",title="Select Excel File for Emails",filetypes=(("All Files","*.*"),("Excel Files",".xlsx")))
@@ -100,13 +102,19 @@ class bulk_email:
         if self.txt_to.get() == "" or self.txt_subj.get() == "" or x == 1:
             messagebox.showerror("Error","All fields are required",parent=self.root)
         else:
-            messagebox.showinfo("Success","Email has been sent!!!",parent=self.root)
+            if self.var_choice.get()=="single":
+                email_function.email_send(self.txt_to.get(),self.txt_subj.get(),self.txt_msg.get("1.0",END),self.from_,self.pass_)
+                messagebox.showinfo("Success","Email has been sent!",parent=self.root)
+            if self.var_choice.get()=="bulk":
+                for x in self.emails:
+                    email_function.email_send(x,self.txt_subj.get(),self.txt_msg.get("1.0",END),self.from_,self.pass_)
 
     def check_single_or_bulk(self):
         if self.var_choice.get() == "single":
             self.btn_browse.config(state=DISABLED)
             self.txt_to.config(state=NORMAL)
             self.txt_to.delete(0,END)
+            self.clear1()
         if self.var_choice.get() == "bulk":
             self.btn_browse.config(state=NORMAL)
             self.txt_to.delete(0,END)
