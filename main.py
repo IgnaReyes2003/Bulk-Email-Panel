@@ -103,11 +103,30 @@ class bulk_email:
             messagebox.showerror("Error","All fields are required",parent=self.root)
         else:
             if self.var_choice.get()=="single":
-                email_function.email_send(self.txt_to.get(),self.txt_subj.get(),self.txt_msg.get("1.0",END),self.from_,self.pass_)
-                messagebox.showinfo("Success","Email has been sent!",parent=self.root)
+                status=email_function.email_send(self.txt_to.get(),self.txt_subj.get(),self.txt_msg.get("1.0",END),self.from_,self.pass_)
+                if status == "s":
+                    messagebox.showinfo("Success","Email has been sent!",parent=self.root)
+                if status == "f":
+                    messagebox.showerror("Failed","Email has not been sent, Try Again",parent=self.root)
+
             if self.var_choice.get()=="bulk":
+                self.failed=[]
+                self.s_count=0
+                self.f_count=0
                 for x in self.emails:
-                    email_function.email_send(x,self.txt_subj.get(),self.txt_msg.get("1.0",END),self.from_,self.pass_)
+                    status=email_function.email_send(x,self.txt_subj.get(),self.txt_msg.get("1.0",END),self.from_,self.pass_)
+                    if status == "s":
+                        self.s_count+=1
+                    if status == "s":
+                        self.f_count+=1
+                    self.status_bar()
+                messagebox.showinfo("Success","The emails were sent, Please Check Status!",parent=self.root)
+
+    def status_bar(self):
+        self.lbl_total.config(text="STATUS: "+str(len(self.emails))+"=>>")
+        self.lbl_sent.config(text="SENT: "+str(self.s_count))
+        self.lbl_left.config(text="LEFT: "+str(len(self.emails)-(self.s_count+self.f_count)))
+        self.lbl_failed.config(text="FAILED: "+str(self.f_count))
 
     def check_single_or_bulk(self):
         if self.var_choice.get() == "single":
