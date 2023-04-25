@@ -5,6 +5,7 @@ import os
 import pandas as pd #pip install pandas
 import email_function
 import time
+import re
 
 class bulk_email:
     def __init__(self,root):
@@ -96,7 +97,6 @@ class bulk_email:
 
             else:
                 messagebox.showerror("Error","Please select file which have Email Columns",parent=self.root)
-
 
     def send_email(self):
         x= len(self.txt_msg.get("1.0",END))
@@ -215,25 +215,20 @@ class bulk_email:
 
     def save_setting(self):
         email=self.txt_from.get()
+        pattern = r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if self.txt_from.get() == "" or self.txt_pass.get() == "":
             messagebox.showerror("Error","All fields are required",parent=self.root2)
 
         #======================== Validate the E-mail Address =================
-        elif email.count("@") == 0:
-            messagebox.showerror("Error","Email is not valid",parent=self.root2)
-        elif email.count(".com") == 0:
-            messagebox.showerror("Error","Email is not valid",parent=self.root2)
-        elif email.count("@") != 1:
-            messagebox.showerror("Error","Email is not valid",parent=self.root2)
-        elif email.count(".com") != 1:
-            messagebox.showerror("Error","Email is not valid",parent=self.root2)
-        #======================================================================
-        else:
+        elif re.match(pattern, email):
             f=open("important.txt","w")
             f.write(self.txt_from.get()+","+self.txt_pass.get())
             f.close()
             messagebox.showinfo("Success","The e-mail address and password have been saved!")
             self.check_file_exist()
+        #======================================================================
+        else:
+            messagebox.showerror("Error","All fields are required",parent=self.root2)
 
 root=Tk()
 obj=bulk_email(root)
