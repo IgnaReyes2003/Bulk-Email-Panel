@@ -221,7 +221,7 @@ class bulk_email:
             f.write(self.txt_from.get()+","+self.txt_pass.get())
             f.close()
             messagebox.showinfo("Success","The e-mail address and password have been saved!")
-
+            self.check_file_exist()
 root=Tk()
 obj=bulk_email(root)
 root.mainloop()
