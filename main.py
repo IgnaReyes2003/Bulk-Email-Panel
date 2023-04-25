@@ -214,14 +214,23 @@ class bulk_email:
         self.pass_=self.credentials[0][1]
 
     def save_setting(self):
+        email=self.txt_from.get()
         if self.txt_from.get() == "" or self.txt_pass.get() == "":
             messagebox.showerror("Error","All fields are required",parent=self.root2)
+
+        #======================== Validate the E-mail Address =================
+        elif email.count("@") == 0:
+            messagebox.showerror("Error","Email is not valid",parent=self.root2)
+        elif email.count(".com") == 0:
+            messagebox.showerror("Error","Email is not valid",parent=self.root2)
+        #======================================================================
         else:
             f=open("important.txt","w")
             f.write(self.txt_from.get()+","+self.txt_pass.get())
             f.close()
             messagebox.showinfo("Success","The e-mail address and password have been saved!")
             self.check_file_exist()
+
 root=Tk()
 obj=bulk_email(root)
 root.mainloop()
