@@ -223,6 +223,10 @@ class bulk_email:
             messagebox.showerror("Error","Email is not valid",parent=self.root2)
         elif email.count(".com") == 0:
             messagebox.showerror("Error","Email is not valid",parent=self.root2)
+        elif email.count("@") != 1:
+            messagebox.showerror("Error","Email is not valid",parent=self.root2)
+        elif email.count(".com") != 1:
+            messagebox.showerror("Error","Email is not valid",parent=self.root2)
         #======================================================================
         else:
             f=open("important.txt","w")
